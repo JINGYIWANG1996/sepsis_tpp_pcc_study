@@ -1,0 +1,15 @@
+import pandas as pd
+import numpy as np
+
+pd.read_csv("/Users/data.csv")
+df=pd.read_csv("/Users/data.csv")
+
+df['map_ventile'] = pd.qcut(df['map'], q=20, labels=False) 
+df['pcc_quintile_within_map_ventile'] = df.groupby('map_ventile')['pcc'].transform(lambda x: pd.qcut(x, q=5, labels=False))
+df['Group'] = df['map_ventile'].astype(str) + '_' + df['pcc_quintile_within_map_ventile'].astype(str)
+print(df)
+
+num_groups = df.groupby(['map_ventile', 'pcc_quintile_within_map_ventile']).size()
+print(num_groups)
+
+df.to_csv("/Users/data.csv", index=False)
