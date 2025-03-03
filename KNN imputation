@@ -1,0 +1,21 @@
+import numpy as np
+from sklearn.impute import KNNImputer
+import pandas as pd
+
+reader = pd.read_csv ( "/Users/data.csv",
+                      chunksize=100000,
+                      iterator=True)
+df_list = []
+i = 0
+for df in reader:
+    
+    KI=KNNImputer(n_neighbors=10,weights="uniform")
+
+    df_imput=KI.fit_transform(df)
+    df = pd.DataFrame(df_imput)
+    df_list.append(df)
+    i = i+1
+    print(i)
+    
+df_output = pd.concat(df_list, ignore_index=True)
+df_output.to_csv("/Users/data(imput).csv", index=False)
