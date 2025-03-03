@@ -1,3 +1,4 @@
+# Import necessary libraries
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -5,53 +6,74 @@ import statsmodels.api as sm
 import matplotlib.pyplot as plt
 from datetime import datetime
 
+# Print the current date and time
 print(datetime.now())
 
-pd.read_csv(  "/Users/data.csv")
-data=pd.read_csv( "/Users/data.csv")
+# Define the file path for the input CSV file
+pd.read_csv("/Users/data.csv")
 
-X_co = []
-Y_map = []
-patient_id = []
+# Read the CSV file into a Pandas DataFrame
+df=pd.read_csv("/Users/data.csv")
 
+# Initialize empty lists to store feature (X) and target (Y) variables, as well as patient IDs
+X_co = []  # List for independent variable (co)
+Y_map = []  # List for dependent variable (map)
+patient_id = []  # List for patient IDs
+
+# Loop through the dataset to extract values for regression
 for i in range(len(df)):
-    X_co_temp = []
-    Y_map_temp = []
-    if (i%24 == 22 or i%24 == 23):
+    X_co_temp = []  # Temporary list for CO values
+    Y_map_temp = []  # Temporary list for MAP values
+    
+    # Skip rows where the index modulo 24 equals 22 or 23
+    if (i % 24 == 22 or i % 24 == 23):
         continue
+    
+    # Extract a sequence of 3 consecutive values for CO and MAP
     for j in range(3):
-        X_co_temp.append(df['co'].iloc[i+j])
-        Y_map_temp.append(df['map'].iloc[i+j])
+        X_co_temp.append(df['co'].iloc[i + j])
+        Y_map_temp.append(df['map'].iloc[i + j])
+    
+    # Append the extracted values to the main lists
     X_co.append(X_co_temp)
     Y_map.append(Y_map_temp)
     patient_id.append(df['id'].iloc[i])
 
-k_co = []
-b_co = []
-rsquared_co = []
+# Initialize lists to store regression results
+k_co = []  # List to store regression coefficients (slope)
+b_co = []  # List to store intercepts
+rsquared_co = []  # List to store R-squared values
 
+# Perform linear regression for each patient's data
 for i in range(len(patient_id)):
-    X_co_temp = X_co[i]
-    Y_map_temp = Y_map[i]
+    X_co_temp = X_co[i]  # Extract CO values for the current patient
+    Y_map_temp = Y_map[i]  # Extract MAP values for the current patient
     
+    # Convert lists to NumPy arrays and reshape them for regression
     x_co_temp = np.array(X_co_temp).reshape(-1, 1)
     y_map_temp = np.array(Y_map_temp).reshape(-1, 1)
     
+    # Perform linear regression using sklearn
     reg_co = LinearRegression().fit(x_co_temp, y_map_temp)
-    k_co.append(reg_co.coef_[0][0])
-    b_co.append(reg_co.intercept_[0])
+    k_co.append(reg_co.coef_[0][0])  # Store the slope (coefficient)
+    b_co.append(reg_co.intercept_[0])  # Store the intercept
     
-    _x_co_temp = sm.add_constant(X_co_temp)
-    model = sm.OLS(Y_map_temp, _x_co_temp)
-    result_co = model.fit()
+    # Perform linear regression using statsmodels to get additional statistics
+    _x_co_temp = sm.add_constant(X_co_temp)  # Add constant term for intercept
+    model = sm.OLS(Y_map_temp, _x_co_temp)  # Create an Ordinary Least Squares (OLS) model
+    result_co = model.fit()  # Fit the model
+    
+    # Store R-squared values
     rsquared_co.append(result_co.rsquared)
-  
 
+# Create a new DataFrame to store regression results
 df1 = pd.DataFrame()
 
-df1['patient_id'] = patient_id
-df1['k_co'] = k_co
-df1['b_co'] = b_co
-df1['rsquared_co'] = rsquared_co
+df1['patient_id'] = patient_id  # Store patient IDs
+df1['k_co'] = k_co  # Store regression slopes
+df1['b_co'] = b_co  # Store regression intercepts
+df1['rsquared_co'] = rsquared_co  # Store R-squared values
 
+# Save the results to a CSV file
 df1.to_csv("/Users/data1.csv", index=False)
+
