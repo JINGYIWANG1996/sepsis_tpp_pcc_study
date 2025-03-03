@@ -1,0 +1,70 @@
+
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+print(datetime.now())
+
+pd.read_csv( "/Users/data.csv")
+df=pd.read_csv("/Users/data.csv")
+
+x = []
+y = []
+x_temp = []
+y_temp = []
+p_id = []
+
+for i in range(len(df)):
+    a = df['co'].iloc[i]
+    b = df['map'].iloc[i]
+    x_temp.append(a)
+    y_temp.append(b)
+    if (i%13 == 12):
+        x.append(x_temp)
+        y.append(y_temp)
+        p_id.append(df['id'].iloc[i])
+        x_temp = []
+        y_temp = []
+
+all_k = []
+all_b = []
+
+for i in range(len(p_id)):
+    x_temp = x[i]
+    y_temp = y[i]
+    k_list = []
+    b_list = []
+    for j in range(len(x_temp) - 1):
+        x_i = [x_temp[j], x_temp[j+1]]
+        y_i = [y_temp[j], y_temp[j+1]]
+        x_i = np.array(x_i).reshape(-1, 1)
+        y_i = np.array(y_i).reshape(-1, 1)
+        reg = LinearRegression().fit(x_i, y_i)
+        k_list.append(reg.coef_[0][0])
+        b_list.append(reg.intercept_[0])
+    all_k.append(k_list)
+    all_b.append(b_list)
+
+p_id_list = []
+kkk = []
+bbb = []
+index = []
+#print(p_id[0])
+for i in range(len(p_id)):
+    for j in range(12):
+        p_id_list.append(p_id[i])
+        kkk.append(all_k[i][j])
+        bbb.append(all_b[i][j])
+        index.append(j+1)
+
+df1 = pd.DataFrame()
+
+df1['id'] = p_id_list
+df1['k'] = kkk
+df1['b'] = bbb
+df1['index'] = index
+
+df1.to_csv( "/Users/data1.csv", index=False)
