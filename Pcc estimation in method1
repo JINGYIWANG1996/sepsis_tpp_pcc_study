@@ -1,0 +1,57 @@
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+print(datetime.now())
+
+pd.read_csv(  "/Users/data.csv")
+data=pd.read_csv( "/Users/data.csv")
+
+X_co = []
+Y_map = []
+patient_id = []
+
+for i in range(len(df)):
+    X_co_temp = []
+    Y_map_temp = []
+    if (i%24 == 22 or i%24 == 23):
+        continue
+    for j in range(3):
+        X_co_temp.append(df['co'].iloc[i+j])
+        Y_map_temp.append(df['map'].iloc[i+j])
+    X_co.append(X_co_temp)
+    Y_map.append(Y_map_temp)
+    patient_id.append(df['id'].iloc[i])
+
+k_co = []
+b_co = []
+rsquared_co = []
+
+for i in range(len(patient_id)):
+    X_co_temp = X_co[i]
+    Y_map_temp = Y_map[i]
+    
+    x_co_temp = np.array(X_co_temp).reshape(-1, 1)
+    y_map_temp = np.array(Y_map_temp).reshape(-1, 1)
+    
+    reg_co = LinearRegression().fit(x_co_temp, y_map_temp)
+    k_co.append(reg_co.coef_[0][0])
+    b_co.append(reg_co.intercept_[0])
+    
+    _x_co_temp = sm.add_constant(X_co_temp)
+    model = sm.OLS(Y_map_temp, _x_co_temp)
+    result_co = model.fit()
+    rsquared_co.append(result_co.rsquared)
+  
+
+df1 = pd.DataFrame()
+
+df1['patient_id'] = patient_id
+df1['k_co'] = k_co
+df1['b_co'] = b_co
+df1['rsquared_co'] = rsquared_co
+
+df1.to_csv("/Users/data1.csv", index=False)
