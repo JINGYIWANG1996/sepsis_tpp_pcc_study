@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Mar  6 22:00:05 2025
-
-@author: jingxiaoyi
-"""
-
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
