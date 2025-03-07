@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Mar  7 11:35:38 2025
-
-@author: jingxiaoyi
-"""
-
 import numpy as np
 from sklearn.impute import KNNImputer
 import pandas as pd
